@@ -55,6 +55,21 @@ class App extends Component {
     }));
   }
   
+  componentDidMount() { 
+    const contacts = localStorage.getItem("contacts");
+    const parsedContacts = JSON.parse(contacts);
+
+    if (parsedContacts) { 
+      this.setState({ contacts: parsedContacts });
+    }
+  };
+
+  componentDidUpdate(prevState) { 
+    if (this.state.contacts !== prevState.contacts) { 
+      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    }
+  };
+
   render() {
 
     const visibleContacts = this.getVisibleContacts();
@@ -64,14 +79,20 @@ class App extends Component {
       width: "400px",
     }
 
+    const contactsLength = this.state.contacts.length;
+
     return (
       <div style={containerStyles}>
         <h1>Phonebook</h1>
         <ContactForm onSubmit={this.handleAddContact} />
 
         <h2>Contacts</h2>
-        <Filter value={ this.state.filter } onChange={this.changeFilter} />
-        <ContactList contacts={visibleContacts} deleteContact={this.deleteContact} />
+        {contactsLength > 0
+          ? <>
+            <Filter value={this.state.filter} onChange={this.changeFilter} />
+            <ContactList contacts={visibleContacts} deleteContact={this.deleteContact} />
+          </>
+          : "no contacts"}
       </div>  
     )
   };
